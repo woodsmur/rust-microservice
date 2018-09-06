@@ -34,10 +34,18 @@ mod routes;
 mod schema;
 mod static_files;
 
-fn rocket() -> rocket::Rocket {
-    dotenv().ok();
+fn database_url() -> Option<String> {
+    match std::env::var("DATABASE_URL") {
+        Ok(s) => Some(s),
+        Err(_) => match dotenv().ok() {
+            Some(_) => Some(env::var("DATABASE_URL").expect("set DATABASE_URL")),
+            None => panic!("no database set in .env or ENV"),
+        },
+    }
+}
 
-    let database_url = env::var("DATABASE_URL").expect("set DATABASE_URL");
+fn rocket() -> rocket::Rocket {
+    let database_url = database_url().unwrap();
     let pool = db::init_pool(database_url);
 
     rocket::ignite()
