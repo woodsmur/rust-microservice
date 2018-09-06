@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: rust-microservice-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - hosts:
+    - 'rust-microservice.istio'
+    port:
+      name: http-ingress-80
+      number: 80
+      protocol: HTTP

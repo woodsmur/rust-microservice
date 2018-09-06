@@ -53,3 +53,21 @@ Now the postgres database is created.
 
     curl -X DELETE -H "Content-Type: application/json" localhost:8000/api/v1/books/1 
 
+# run in istio
+
+	kubectl create -f istio/rust-microservice.yaml -f istio/rust-microservice-svc.yaml
+	istioctl create -f istio/rust-microservice-virtualservice.yaml -f istio/gateway.yaml
+
+in order to send query to istio service mesh, you need to get the gateway.
+
+	export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
+	export INGRESS_HOST=$(kubectl get po -l istio=ingressgateway -n istio-system -o 'jsonpath={.items[0].status.hostIP}')
+	export GATEWAY_URL=$INGRESS_HOST:$INGRESS_PORT
+
+then send query by adding `-H "Host: rust-microservice.istio"`
+
+	curl -X POST \
+		-H "Host: rust-microservice.istio" \
+		-H "Content-Type: application/json" \
+        ${GATEWAY_URL}:8000/api/v1/books \
+        -d '{"title":"a book", "author":"a author", "published":false}'

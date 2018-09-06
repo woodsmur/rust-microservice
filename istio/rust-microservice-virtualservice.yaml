@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: rust-microservice-virtualservice
+spec:
+  gateways:
+  - rust-microservice-gateway
+  hosts:
+  - 'rust-microservice.istio'
+  http:
+  - match:
+    - authority:
+        exact: rust-microservice.istio
+      uri:
+        prefix: /
+    route:
+    - destination:
+        host: rust-microservice-svc
+        port:
+          number: 8000
+      weight: 100

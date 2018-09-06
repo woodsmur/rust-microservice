@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: rust-microservice
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: rust-microservice
+    spec:
+      containers:
+      - image: quay.io/woodsmur/rust-microservice
+        imagePullPolicy: Always
+        name: rust-microservice
+        env:
+          - name: DATABASE_URL
+            value: postgres://diesel:diesel@${PG_HOST}:5432/rust_microservice
+        ports:
+        - containerPort: 8000
