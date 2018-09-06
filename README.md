@@ -3,15 +3,29 @@ prepare `dotenv`
 
     echo DATABASE_URL=postgres://diesel:diesel@localhost/rust_microservice > .env
 
-diesel setup
+diesel setup in local
 
-    diesel setup
+    diesel migration run
+
+diesel migaration in docker
+
+    IP=$(ipconfig getifaddr en0)
+    DATABASE_URL=postgres://diesel:diesel@${IP}:5436/rust_microservice
+    docker run --rm \
+        -v "$PWD:/volume" \
+        -w /volume \
+        -e DATABASE_URL="${DATABASE_URL}" \
+        -it clux/diesel-cli diesel migration run
 
 Now the postgres database is created.
 
 # run service
 
     cargo run
+
+# run by docker-compose
+
+    cd docker-compose && docker-compose up -d
 
 # send query
 

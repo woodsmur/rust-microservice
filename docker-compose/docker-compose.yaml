@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  web:
+    image: quay.io/woodsmur/rust-microservice
+    ports:
+      - "3000:8000"
+    environment:
+      - "DATABASE_URL=postgres://diesel:diesel@db/rust_microservice"
+    links:
+      - db
+  db:
+    ports:
+      - '5436:5432' # 5436 <- change this value
+    restart: always
+    image: postgres:9.6.5-alpine
+    volumes:
+      - ./postgres-initdb.sh:/docker-entrypoint-initdb.d/init.sh
