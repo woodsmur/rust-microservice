@@ -80,6 +80,40 @@ First, replace `DATABASE_URL` in `rust-microservice.yaml`
                     -f istio/gateway.yaml \
                     -f istio/serviceentry.yaml
 
+check running status:
+
+kuernetes pods
+
+    $ kubectl get pod
+    NAME                                 READY     STATUS    RESTARTS   AGE
+    rust-microservice-6d565944d9-hjzpj   2/2       Running   0          18m
+    rust-microservice-6d565944d9-q6chj   2/2       Running   0          18m
+
+kubernetes service
+
+    $ kubectl get svc
+    NAME                TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+    kubernetes          ClusterIP   10.233.0.1      <none>        443/TCP    96d
+    rust-microservice   ClusterIP   10.233.12.109   <none>        8000/TCP   1h
+
+istio service entry
+
+    $ istioctl get serviceentry
+    SERVICE-ENTRY NAME             HOSTS                                                   PORTS      NAMESPACE   AGE
+    postgres-access-microservice   *.stampy.db.elephantsql.com,*.compute-1.amazonaws.com   TCP/5432   default     26s
+
+istio virtual service
+
+    $ istioctl get virtualservice
+    VIRTUAL-SERVICE NAME               GATEWAYS                    HOSTS                     #HTTP     #TCP      NAMESPACE   AGE
+    rust-microservice-virtualservice   rust-microservice-gateway   rust-microservice.istio       1        0      default     1h
+
+istio gateway
+
+    $ istioctl get gateway
+    GATEWAY NAME                HOSTS                     NAMESPACE   AGE
+    rust-microservice-gateway   rust-microservice.istio   default     1h
+
 in order to send query to istio service mesh, you need to get the gateway.
 
     export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
