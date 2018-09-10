@@ -1,0 +1,13 @@
+# for postgresql db
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: postgres-access-microservice
+spec:
+  hosts:
+  - "*.stampy.db.elephantsql.com"
+  - "*.compute-1.amazonaws.com"
+  ports:
+  - number: 5432
+    protocol: TCP
+    name: postgres

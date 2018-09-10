@@ -14,7 +14,9 @@ spec:
         imagePullPolicy: Always
         name: rust-microservice
         env:
+          - name: RUST_BACKTRACE
+            value: "1"
           - name: DATABASE_URL
-            value: postgres://diesel:diesel@${PG_HOST}:5432/rust_microservice
+            value: postgres://blackmirror:c2118146e07blackmirrormirrorblackblackmirrormirrorblackf82190758@ec2-111-111-111-111.compute-1.amazonaws.com:5432/blackmirror
         ports:
         - containerPort: 8000

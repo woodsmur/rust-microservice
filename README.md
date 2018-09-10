@@ -10,7 +10,12 @@ prepare `dotenv`
 
 You can launch a postgres database in https://www.elephantsql.com/, and replace `.env` with managed database URL:
 
-	echo DATABASE_URL=postgres://managedb:MANAGEDDATABASEPASSWORD@stampy.db.elephantsql.com:5432/managedb > .env
+    echo DATABASE_URL=postgres://managedb:MANAGEDDATABASEPASSWORD@stampy.db.elephantsql.com:5432/managedb > .env
+
+You can also launch a postgres database in https://data.heroku.com, and replace `.env` with heroku managed database URL:
+
+    echo DATABASE_URL=postgres://blackmirror:c2118146e07blackmirrormirrorblackblackmirrormirrorblackf82190758@ec2-111-111-111-111.compute-1.amazonaws.com:5432/blackmirror
+ > .env
 
 # 2. database migration
 
@@ -66,22 +71,26 @@ run by docker-compose
 
     curl -X DELETE -H "Content-Type: application/json" localhost:8000/api/v1/books/1 
 
-# run in istio
+# 5. run in istio
+First, replace `DATABASE_URL` in `rust-microservice.yaml`
 
-	kubectl create -f istio/rust-microservice.yaml -f istio/rust-microservice-svc.yaml
-	istioctl create -f istio/rust-microservice-virtualservice.yaml -f istio/gateway.yaml
+    kubectl create -f istio/rust-microservice.yaml \
+                   -f istio/rust-microservice-svc.yaml
+    istioctl create -f istio/rust-microservice-virtualservice.yaml \
+                    -f istio/gateway.yaml \
+                    -f istio/serviceentry.yaml
 
 in order to send query to istio service mesh, you need to get the gateway.
 
-	export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
-	export INGRESS_HOST=$(kubectl get po -l istio=ingressgateway -n istio-system -o 'jsonpath={.items[0].status.hostIP}')
-	export GATEWAY_URL=$INGRESS_HOST:$INGRESS_PORT
+    export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
+    export INGRESS_HOST=$(kubectl get po -l istio=ingressgateway -n istio-system -o 'jsonpath={.items[0].status.hostIP}')
+    export GATEWAY_URL=$INGRESS_HOST:$INGRESS_PORT
 
 then send query by adding `-H "Host: rust-microservice.istio"`
 
-	curl -X POST \
-		-H "Host: rust-microservice.istio" \
-		-H "Content-Type: application/json" \
+    curl -X POST \
+        -H "Host: rust-microservice.istio" \
+        -H "Content-Type: application/json" \
         ${GATEWAY_URL}:8000/api/v1/books \
         -d '{"title":"a book", "author":"a author", "published":false}'
 
