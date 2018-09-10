@@ -1,13 +1,24 @@
-# database setup
+# 1. database setup
+
+## local database
+
 prepare `dotenv`
 
     echo DATABASE_URL=postgres://diesel:diesel@localhost/rust_microservice > .env
 
-diesel setup in local
+## managed database
+
+You can launch a postgres database in https://www.elephantsql.com/, and replace `.env` with managed database URL:
+
+	echo DATABASE_URL=postgres://managedb:MANAGEDDATABASEPASSWORD@stampy.db.elephantsql.com:5432/managedb > .env
+
+# 2. database migration
+
+diesel setup in local or in managed database
 
     diesel migration run
 
-diesel migaration in docker
+if you use run database instance in docker, you can do database migration using `clux/diesel-cli`
 
     IP=$(ipconfig getifaddr en0)
     DATABASE_URL=postgres://diesel:diesel@${IP}:5436/rust_microservice
@@ -19,15 +30,17 @@ diesel migaration in docker
 
 Now the postgres database is created.
 
-# run service
+# 3. run service
+
+run service in local
 
     cargo run
 
-# run by docker-compose
+run by docker-compose
 
     cd docker-compose && docker-compose up -d
 
-# send query
+# 4. send query
 
 ## new a book
 
@@ -71,3 +84,4 @@ then send query by adding `-H "Host: rust-microservice.istio"`
 		-H "Content-Type: application/json" \
         ${GATEWAY_URL}:8000/api/v1/books \
         -d '{"title":"a book", "author":"a author", "published":false}'
+
